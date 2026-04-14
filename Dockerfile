@@ -1,8 +1,10 @@
 FROM node:20-slim
 
-# Install system dependencies required by sharp
+# Install system dependencies required by sharp (WebP + AVIF/AV1)
 RUN apt-get update && apt-get install -y \
     libvips-dev \
+    libheif-dev \
+    libaom-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Create app directory
