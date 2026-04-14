@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: bandwidth-hero-proxy
+    env: node
+    region: oregon   # change to: frankfurt, singapore, ohio, virginia as needed
+    plan: free       # upgrade to "starter" ($7/mo) to avoid cold starts
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        generateValue: false   # Render sets PORT automatically; do not override
+    healthCheckPath: /health
+    autoDeploy: true           # redeploys automatically on git push
