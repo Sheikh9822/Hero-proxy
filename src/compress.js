@@ -14,15 +14,28 @@ function redirect(req, res) {
 }
 
 function compress(req, res, input) {
-  const format = req.params.webp ? 'webp' : 'jpeg'
+  // Priority: forced format from route > query param > default WebP
+  let format
+  if (req.forceFormat === 'avif') {
+    format = 'avif'
+  } else {
+    format = req.params.webp ? 'webp' : 'jpeg'
+  }
+
+  const formatOptions = {
+    quality: req.params.quality,
+    progressive: true,
+  }
+
+  // AVIF-specific options
+  if (format === 'avif') {
+    delete formatOptions.progressive // not supported in AVIF
+    formatOptions.effort = 4 // 0 (fastest) – 9 (slowest). 4 is a balanced default
+  }
 
   sharp(input)
     .grayscale(req.params.grayscale)
-    .toFormat(format, {
-      quality: req.params.quality,
-      progressive: true,
-      optimizeScans: true
-    })
+    .toFormat(format, formatOptions)
     .toBuffer((err, output, info) => {
       if (err || !info) return redirect(req, res)
 
